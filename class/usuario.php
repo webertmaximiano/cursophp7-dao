@@ -118,6 +118,18 @@ class Usuario {
         ));
     }
 
+    public function delete(){
+        $sql = new SqL (); // instancia do Bd
+        $sql->query ("DELETE tb_usuarios WHERE idusuario =:ID", array(
+              ':ID'=>$this->getIdusuario()
+        ));
+        
+        $this->setIdusuario(0);
+        $this->setDeslogin("");
+        $this->setDessenha("");
+        $this->setDtcadastro(new DateTime());
+    }
+
     public function __construct($Login = "",$password =""){ //AS ASPAS VAZIAS É PRA NAO DA ERRO SE DEIXAR EM BRANCO OS DADOS
      
         $this->setDeslogin($Login);
