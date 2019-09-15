@@ -40,12 +40,13 @@ class Usuario {
             ":ID"=>$id
         ));
         if (count($results) > 0) {
-            $row = $results[0];
+           // $row = $results[0];
             //pegar as linhas e passar os dados
-            $this->setIdusuario($row['idusuario']);
-            $this->setDeslogin($row['deslogin']);
-            $this->setDessenha($row['dessenha']);
-            $this->setDtcadastro(new DateTime($row['dtcadastro']));
+           // $this->setIdusuario($row['idusuario']);
+           // $this->setDeslogin($row['deslogin']);
+           // $this->setDessenha($row['dessenha']);
+            //$this->setDtcadastro(new DateTime($row['dtcadastro']));
+            $this->setData($results[0]);
         }
 
     }
@@ -70,15 +71,59 @@ class Usuario {
             ":PASSWORD"=>$password
         ));
         if (count($results) > 0) {
-            $row = $results[0];
+            $this->setData($results[0]);
+           // $row = $results[0];
             //pegar as linhas e passar os dados
-            $this->setIdusuario($row['idusuario']);
-            $this->setDeslogin($row['deslogin']);
-            $this->setDessenha($row['dessenha']);
-            $this->setDtcadastro(new DateTime($row['dtcadastro']));
+           // $this->setIdusuario($row['idusuario']);
+           // $this->setDeslogin($row['deslogin']);
+           // $this->setDessenha($row['dessenha']);
+           // $this->setDtcadastro(new DateTime($row['dtcadastro']));
         }else {
             throw new Exception("Login ou Senha inválidos");
         }
+    }
+
+    public function setData($data){
+// seta os dados do bd
+        $this->setIdusuario($data['idusuario']);
+        $this->setDeslogin($data['deslogin']);
+        $this->setDessenha($data['dessenha']);
+        $this->setDtcadastro(new DateTime($data['dtcadastro']));
+
+    }
+
+    public function insert(){
+        $sql = new SqL ();
+
+        $results = $sql->select("CALL sp_usuarios_insert (:LOGIN, :PASSWORD)", array(
+            ':LOGIN'=>$this->getDeslogin(), 
+            ':PASSWORD'=>$this->getDessenha()
+        ));
+        if (count($results) > 0){
+            $this->setData($results[0]);
+        }
+    }
+
+    public function update($Login, $password){
+
+        $this->setDeslogin($Login);
+        $this->setDessenha($password);
+
+
+        $sql = new SqL ();
+        $sql->query ("UPDATE tb_usuarios SET deslogin = :LOGIN, dessenha =:PASSWORD WHERE idusuario =:ID", array(
+            ':LOGIN'=>$this->getDeslogin(), 
+            ':PASSWORD'=>$this->getDessenha(),
+            ':ID'=>$this->getIdusuario()
+        ));
+    }
+
+    public function __construct($Login = "",$password =""){ //AS ASPAS VAZIAS É PRA NAO DA ERRO SE DEIXAR EM BRANCO OS DADOS
+     
+        $this->setDeslogin($Login);
+
+        $this->setDessenha($password);
+
     }
 
 
@@ -88,6 +133,7 @@ class Usuario {
             "deslogin"=>$this->getDeslogin(),
             "dessenha"=>$this->getDessenha(),
             "dtcadastro"=>$this->getDtcadastro()->format("d/m/Y H:i:s")
+           
         ));
     }
 }
